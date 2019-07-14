@@ -1,23 +1,23 @@
 [
   {
     "dimensions": {
-      "x": 200,
+      "x": 400,
       "y": 300
     },
-    "scaling_factor": 4,
+    "scaling_factor": 3,
     "n_iterations": 150,
     "colors_max": 50,
     "threshold": 2,
     "polynomial": {
       "0": {
-        "real": 0.3,
-        "imaginary": 0.45
+        "real": 0.45,
+        "imaginary": 0.4
       },
       "1": {
-        "real": 1
+        "real": -1
       },
       "4": {
-        "real": 1
+        "real": 3
       }
     },
     "r_start": 0.78,
