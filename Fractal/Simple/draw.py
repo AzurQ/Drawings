@@ -4,60 +4,59 @@ import colorsys
 import json
 from PIL import Image
 from PIL import ImageDraw
+import itertools
 
 def main(folder_save):
+    image_number = 0
 
-    with open('inputs.json') as json_file:
-        inputs = json.load(json_file)[0]
 
-    dimensions = (inputs["dimensions"]["x"], inputs["dimensions"]["y"])
-    scaling_factor = inputs["scaling_factor"]
-    n_iterations = inputs["n_iterations"]
-    colors_max = inputs["colors_max"]
+    def to_list(x):
+        if not isinstance(x, list):
+            x = [x]
+        return(x)
 
-    threshold = inputs["threshold"]
 
-    r_start = inputs["r_start"]
-    r_coef = inputs["r_coef"]
-    g_start = inputs["g_start"]
-    g_coef = inputs["g_coef"]
-    b_start = inputs["b_start"]
-    b_coef = inputs["b_coef"]
-    speed = inputs["speed"]
-    dark2light = inputs["dark2light"]
+    # def list_of_list_transform(list):
+    #     new_list = []
+    #     for degree in range(len(list)):
+    #         for value in range(len(list[degree])):
 
-    upward_shift = inputs["upward_shift"]
-    right_shift = inputs["right_shift"]
 
 
     def extract_poly(dict):
-        poly = []
+        poly_list = []
         for key in dict:
-            if len(poly) <= int(key):
-                poly = poly + [0 for _ in range(int(key) - len(poly) + 1)]
+            if len(poly_list) <= int(key):
+                poly_list = poly_list + [0 for _ in range(int(key) - len(poly_list) + 1)]
             if "imaginary" in dict[key]:
                 if "real" in dict[key]:
-                    poly[int(key)] = complex(dict[key]["real"], dict[key]["imaginary"])
+                    poly_list[int(key)] = [complex(a, b) for (a, b) in itertools.product(to_list(dict[key]["real"]), to_list(dict[key]["imaginary"]))]
                 else:
-                    poly[int(key)] = complex(0, dict[key]["imaginary"])
+                    poly_list[int(key)] = [complex(0, b) for b in to_list(dict[key]["imaginary"])]
             else:
-                poly[int(key)] = dict[key]["real"]
-        return(poly)
+                poly_list[int(key)] = [a for a in to_list(dict[key]["real"])]
+        return(poly_list)
 
 
-    def create_palette():
+    def create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max):
         if (r_start < 0) or (r_start > 1):
-            raise ValueError("r_start is ill-defined")
+            print("r_start is ill-defined")
+            return(None)
         if (g_start < 0) or (g_start > 1):
-            raise ValueError("g_start is ill-defined")
+            print("g_start is ill-defined")
+            return(None)
         if (b_start < 0) or (b_start > 1):
-            raise ValueError("b_start is ill-defined")
+            print("b_start is ill-defined")
+            return(None)
         if (r_start + r_coef < 0) or (r_start + r_coef > 1):
-            raise ValueError("r_coef is ill-defined")
+            print("r_coef is ill-defined")
+            return(None)
         if (g_start + g_coef < 0) or (g_start + g_coef > 1):
-            raise ValueError("g_coef is ill-defined")
+            print("g_coef is ill-defined")
+            return(None)
         if (b_start + b_coef < 0) or (b_start + b_coef > 1):
-            raise ValueError("b_coef is ill-defined")
+            print("b_coef is ill-defined")
+            return(None)
 
         palette = [0] * colors_max
 
@@ -82,9 +81,7 @@ def main(folder_save):
         return None
 
 
-    def draw(folder_save):
-        palette = create_palette()
-        poly = extract_poly(inputs["polynomial"])
+    def draw(folder_save, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, palette):
 
         center = (scaling_factor / 2, (scaling_factor / 2) * dimensions[1]/dimensions[0])
 
@@ -108,13 +105,45 @@ def main(folder_save):
             path = path + str(folder_save) + "/"
             if not os.path.exists(path):
                 os.makedirs(path)
-        img.save(path + "1.png")
-        with open(path + "1-inputs.json", 'w') as f:
+        name = path + str(image_number)
+        img.save(name + ".png")
+        with open(name + "-inputs.json", 'w') as f:
             json.dump(inputs, f)
 
         del d
 
-    draw(folder_save)
+
+    with open('inputs.json') as json_file:
+        inputs = json.load(json_file)[0]
+
+
+    input_to_convert_list_1 = ["r_start", "r_coef", "g_start", "g_coef", "b_start", "b_coef", "speed", "dark2light", "colors_max"]
+    for item in input_to_convert_list_1:
+        inputs[item] = to_list(inputs[item])
+
+
+    for r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max in itertools.product(inputs["r_start"], inputs["r_coef"], inputs["g_start"], inputs["g_coef"], inputs["b_start"], inputs["b_coef"], inputs["speed"], inputs["dark2light"], inputs["colors_max"]):
+
+        palette = create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max)
+        if palette is not None:
+
+            inputs["dimensions"]["x"] = to_list(inputs["dimensions"]["x"])
+            inputs["dimensions"]["y"] = to_list(inputs["dimensions"]["y"])
+            input_to_convert_list_2 = ["n_iterations", "threshold", "scaling_factor", "right_shift", "upward_shift"]
+            for item in input_to_convert_list_2:
+                inputs[item] = to_list(inputs[item])
+
+            for n_iterations, threshold, scaling_factor, right_shift, upward_shift, dimension_x, dimension_y in itertools.product(inputs["n_iterations"], inputs["threshold"], inputs["scaling_factor"], inputs["right_shift"], inputs["upward_shift"], inputs["dimensions"]["x"], inputs["dimensions"]["y"]):
+
+                dimensions = [dimension_x, dimension_y]
+
+                poly_raw_list = extract_poly(inputs["polynomial"])
+                # poly_list = list_of_list_transform(poly_raw_list)
+                poly = [poly_raw_list[i][0] for i in range(len(poly_raw_list))]
+
+                draw(folder_save, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, palette)
+                image_number += 1
+
 
 if __name__ == "__main__":
     if len(sys.argv) == 1:
