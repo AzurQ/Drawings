@@ -1,0 +1,34 @@
+[
+  {
+    "dimensions": {
+      "x": 200,
+      "y": 300
+    },
+    "scaling_factor": 4,
+    "n_iterations": 150,
+    "colors_max": 50,
+    "threshold": 2,
+    "polynomial": {
+      "0": {
+        "real": 0,
+        "imaginary": 0.45
+      },
+      "1": {
+        "real": 1
+      },
+      "4": {
+        "real": 1
+      }
+    },
+    "r_start": 0.78,
+    "r_coef": -0.55,
+    "g_start": 0.9,
+    "g_coef": -0.6,
+    "b_start": 0,
+    "b_coef": 0.8,
+    "speed": 15,
+    "dark2light": true,
+    "upward_shift": 0,
+    "right_shift": 0
+  }
+]

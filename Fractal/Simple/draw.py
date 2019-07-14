@@ -4,27 +4,45 @@ import json
 from PIL import Image
 from PIL import ImageDraw
 
-dimensions = (300, 200)
-scaling_factor = 4
-n_iterations = 150
-colors_max = 50
+with open('inputs.json') as json_file:
+    inputs = json.load(json_file)[0]
 
-poly = [complex(0.3, 0.3), 1, 0, 0, 1]
-threshold = 2
+dimensions = (inputs["dimensions"]["x"], inputs["dimensions"]["y"])
+scaling_factor = inputs["scaling_factor"]
+n_iterations = inputs["n_iterations"]
+colors_max = inputs["colors_max"]
 
-r_start = 0.78
-r_coef = - 0.55
-g_start = 0.9
-g_coef = - 0.6
-b_start = 0
-b_coef = 0.8
-speed = 15
-dark2light = True
+threshold = inputs["threshold"]
+
+r_start = inputs["r_start"]
+r_coef = inputs["r_coef"]
+g_start = inputs["g_start"]
+g_coef = inputs["g_coef"]
+b_start = inputs["b_start"]
+b_coef = inputs["b_coef"]
+speed = inputs["speed"]
+dark2light = inputs["dark2light"]
+
+upward_shift = inputs["upward_shift"]
+right_shift = inputs["right_shift"]
 
 
+def extract_poly(dict):
+    poly = []
+    for key in dict:
+        if len(poly) <= int(key):
+            poly = poly + [0 for _ in range(int(key) - len(poly) + 1)]
+        if "imaginary" in dict[key]:
+            if "real" in dict[key]:
+                poly[int(key)] = complex(dict[key]["real"], dict[key]["imaginary"])
+            else:
+                poly[int(key)] = complex(0, dict[key]["imaginary"])
+        else:
+            poly[int(key)] = dict[key]["real"]
+    return(poly)
 
-def create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light = True):
 
+def create_palette():
     if (r_start < 0) or (r_start > 1):
         raise ValueError("r_start is ill-defined")
     if (g_start < 0) or (g_start > 1):
@@ -63,7 +81,8 @@ def iterate(z, poly, threshold, n_iterations):
 
 
 def draw():
-    palette = create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light)
+    palette = create_palette()
+    poly = extract_poly(inputs["polynomial"])
 
     center = (scaling_factor / 2, (scaling_factor / 2) * dimensions[1]/dimensions[0])
 
@@ -72,7 +91,7 @@ def draw():
 
     for x in range(dimensions[0]):
         for y in range(dimensions[1]):
-            z = complex(x * scaling_factor / dimensions[0] - center[0], y * scaling_factor / dimensions[0] - center[1])
+            z = complex(x * scaling_factor / dimensions[0] - center[0] - right_shift, y * scaling_factor / dimensions[0] - center[1] + upward_shift)
             n = iterate(z, poly, threshold, n_iterations)
 
             if n is None:
@@ -84,7 +103,8 @@ def draw():
 
     del d
 
-    img.save("result.png")
+    img.save("Results/1.png")
+    with open('Results/1-inputs.json', 'w') as f:
+        json.dump(inputs, f)
 
 draw()
-    
