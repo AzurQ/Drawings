@@ -1,2 +1,2 @@
 # Drawings
-Making Art With Python
+Making (Trying to) Art With Python
