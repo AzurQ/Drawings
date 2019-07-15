@@ -16,18 +16,24 @@ def main(folder_save):
         return(x)
 
 
-    # def list_of_list_transform(list):
-    #     new_list = []
-    #     for degree in range(len(list)):
-    #         for value in range(len(list[degree])):
-
+    def list_of_list_transform(list):
+        new_list = []
+        for degree in range(len(list)):
+            if len(new_list) == 0:
+                new_list = [[x] for x in list[degree]]
+            else:
+                temp_list = []
+                for value in list[degree]:
+                    temp_list = temp_list + [x + [value] for x in new_list]
+                new_list = temp_list
+        return(new_list)
 
 
     def extract_poly(dict):
         poly_list = []
         for key in dict:
             if len(poly_list) <= int(key):
-                poly_list = poly_list + [0 for _ in range(int(key) - len(poly_list) + 1)]
+                poly_list = poly_list + [to_list(0) for _ in range(int(key) - len(poly_list) + 1)]
             if "imaginary" in dict[key]:
                 if "real" in dict[key]:
                     poly_list[int(key)] = [complex(a, b) for (a, b) in itertools.product(to_list(dict[key]["real"]), to_list(dict[key]["imaginary"]))]
@@ -101,13 +107,14 @@ def main(folder_save):
                 d.point((x, y), fill = palette[int(v * (colors_max - 1))])
 
         path = "Results/"
+        inputs_path = path
         if folder_save is not None:
             path = path + str(folder_save) + "/"
-            if not os.path.exists(path):
-                os.makedirs(path)
-        name = path + str(image_number)
-        img.save(name + ".png")
-        with open(name + "-inputs.json", 'w') as f:
+            inputs_path = inputs_path + str(folder_save) + "/"
+            if not os.path.exists(inputs_path):
+                os.makedirs(inputs_path)
+        img.save(path + str(image_number) + ".png")
+        with open(inputs_path + str(image_number) + "-inputs.json", 'w') as f:
             json.dump(inputs, f)
 
         del d
@@ -138,11 +145,11 @@ def main(folder_save):
                 dimensions = [dimension_x, dimension_y]
 
                 poly_raw_list = extract_poly(inputs["polynomial"])
-                # poly_list = list_of_list_transform(poly_raw_list)
-                poly = [poly_raw_list[i][0] for i in range(len(poly_raw_list))]
+                poly_list = list_of_list_transform(poly_raw_list)
+                for poly in poly_list:
 
-                draw(folder_save, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, palette)
-                image_number += 1
+                    draw(folder_save, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, palette)
+                    image_number += 1
 
 
 if __name__ == "__main__":

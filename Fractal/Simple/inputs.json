@@ -5,33 +5,35 @@
       "y": 200
     },
     "scaling_factor": [
-      3,
-      4
+      5
     ],
     "n_iterations": 150,
     "colors_max": 5000,
     "threshold": 2,
     "polynomial": {
       "0": {
-        "real": 0.2,
-        "imaginary": [
-          0.3,
-          0.5
-        ]
-      },
-      "1": {
         "real": [
-          1,
-          0
+          -0.35
         ],
         "imaginary": [
-          1,
-          0
+          0.54
         ]
       },
       "2": {
-        "real": 1,
-        "imaginary": 1.5
+        "real": [
+          1.3
+        ],
+        "imaginary": [
+          -0.5
+        ]
+      },
+      "10": {
+        "real": [
+          0.5
+        ],
+        "imaginary": [
+          -0.5
+        ]
       }
     },
     "r_start": 0.78,
