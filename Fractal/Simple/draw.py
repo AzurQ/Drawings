@@ -87,7 +87,18 @@ def main(folder_save):
         return None
 
 
-    def draw(folder_save, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, palette):
+    def generate_result_path(folder_save):
+        path = "Results/"
+        input_path = path
+        if folder_save is not None:
+            path = path + str(folder_save) + "/"
+            input_path = input_path + str(folder_save) + "/"
+            if not os.path.exists(input_path):
+                os.makedirs(input_path)
+        return(path, input_path)
+
+
+    def draw(path, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, palette):
 
         center = (scaling_factor / 2, (scaling_factor / 2) * dimensions[1]/dimensions[0])
 
@@ -106,18 +117,21 @@ def main(folder_save):
 
                 d.point((x, y), fill = palette[int(v * (colors_max - 1))])
 
-        path = "Results/"
-        inputs_path = path
-        if folder_save is not None:
-            path = path + str(folder_save) + "/"
-            inputs_path = inputs_path + str(folder_save) + "/"
-            if not os.path.exists(inputs_path):
-                os.makedirs(inputs_path)
         img.save(path + str(image_number) + ".png")
-        with open(inputs_path + str(image_number) + "-inputs.json", 'w') as f:
-            json.dump(inputs, f)
-
         del d
+
+
+    def write_inputs(input_path, poly, input_dict):
+        output_file = input_dict.copy()
+        for degree in range(len(poly)):
+            if poly[degree] != 0:
+                output_file[str(degree)] = {}
+                if poly[degree].real != 0:
+                    (output_file[str(degree)])["real"] = (poly[degree]).real
+                if poly[degree].imag != 0:
+                    (output_file[str(degree)])["imaginary"] = (poly[degree]).imag
+        with open(input_path + str(image_number) + "-inputs.json", 'w') as f:
+            json.dump(output_file, f)
 
 
     with open('inputs.json') as json_file:
@@ -132,6 +146,7 @@ def main(folder_save):
     for r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max in itertools.product(inputs["r_start"], inputs["r_coef"], inputs["g_start"], inputs["g_coef"], inputs["b_start"], inputs["b_coef"], inputs["speed"], inputs["dark2light"], inputs["colors_max"]):
 
         palette = create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max)
+        input_dict = {"r_start": r_start, "r_coef": r_coef, "g_start": g_start, "g_coef": g_coef, "b_start": b_start, "b_coef": b_coef, "speed": speed, "dark2light": dark2light, "colors_max": colors_max}
         if palette is not None:
 
             inputs["dimensions"]["x"] = to_list(inputs["dimensions"]["x"])
@@ -142,13 +157,21 @@ def main(folder_save):
 
             for n_iterations, threshold, scaling_factor, right_shift, upward_shift, dimension_x, dimension_y in itertools.product(inputs["n_iterations"], inputs["threshold"], inputs["scaling_factor"], inputs["right_shift"], inputs["upward_shift"], inputs["dimensions"]["x"], inputs["dimensions"]["y"]):
 
+                input_dict["n_iterations"] = n_iterations
+                input_dict["threshold"] = threshold
+                input_dict["scaling_factor"] = scaling_factor
+                input_dict["right_shift"] = right_shift
+                input_dict["upward_shift"] = upward_shift
+                input_dict["dimensions"] = {"x": dimension_x, "y": dimension_y}
                 dimensions = [dimension_x, dimension_y]
 
                 poly_raw_list = extract_poly(inputs["polynomial"])
                 poly_list = list_of_list_transform(poly_raw_list)
                 for poly in poly_list:
 
-                    draw(folder_save, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, palette)
+                    path, input_path = generate_result_path(folder_save)
+                    draw(path, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, palette)
+                    write_inputs(input_path, poly, input_dict)
                     image_number += 1
 
 
