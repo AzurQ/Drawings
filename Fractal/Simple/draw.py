@@ -2,7 +2,7 @@ import sys
 import os
 import json
 import itertools
-from functions import to_list, list_of_list_transform, extract_poly, create_palette, iterate, generate_result_path, draw, write_inputs
+from functions import to_list, list_of_list_transform, extract_poly, create_palette, generate_result_path, draw, write_inputs
 
 def draw(folder_save, display = False):
     image_number = 0
