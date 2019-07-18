@@ -141,15 +141,16 @@ def draw_image(path, image_number, poly, n_iterations, dimensions, threshold, sc
 def write_inputs(input_path, poly, input_dict, image_number):
     # Copy input file data
     output_file = input_dict.copy()
+    output_file["polynomial"] = {}
     # Generate the polynomial dictionnary of current data
     for degree in range(len(poly)):
         if poly[degree] != 0:
             # Write non-nul coefficients
-            output_file[str(degree)] = {}
+            output_file["polynomial"][str(degree)] = {}
             if poly[degree].real != 0:
-                (output_file[str(degree)])["real"] = (poly[degree]).real
+                (output_file["polynomial"][str(degree)])["real"] = (poly[degree]).real
             if poly[degree].imag != 0:
-                (output_file[str(degree)])["imaginary"] = (poly[degree]).imag
+                (output_file["polynomial"][str(degree)])["imaginary"] = (poly[degree]).imag
     # Save input file data
     with open(input_path + str(image_number) + "-draw-inputs.json", 'w') as f:
         json.dump(output_file, f)

@@ -5,44 +5,27 @@
       "y": 200
     },
     "scaling_factor": [
-      5
+      7
     ],
     "n_iterations": 50,
     "colors_max": 5000,
     "threshold": 2,
     "polynomial": {
       "0": {
-        "real": [
-          0.1
-        ],
-        "imaginary": [
-          -0.1,
-          -0.2
-        ]
+        "real": 0.2,
+        "imaginary": 0.8
       },
       "1": {
-        "real": [
-          2
-        ],
-        "imaginary": [
-          0
-        ]
+        "real": 0.3
       },
       "2": {
-        "real": [
-          0.5
-        ],
-        "imaginary": [
-          0
-        ]
+        "real": 0.7
       },
       "3": {
-        "real": [
-          1
-        ],
-        "imaginary": [
-          0
-        ]
+        "real": 1
+      },
+      "4": {
+        "real": 0.3
       }
     },
     "r_start": 0.78,
