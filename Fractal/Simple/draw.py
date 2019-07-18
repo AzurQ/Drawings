@@ -2,17 +2,19 @@ import sys
 import os
 import json
 import itertools
-from functions import to_list, list_of_list_transform, extract_poly, create_palette, generate_result_path, draw, write_inputs
+import argparse
+from functions import to_list, list_of_list_transform, extract_poly, create_palette, generate_result_path, draw_image, write_inputs
 
 # Draw a fractal from given inputs
 ## Inputs may be provided as lists - all possibilites are produced
-def draw(folder_save, display = False,  image_number = 0):
+def draw(folder_save, display = False, draw_input_file = "draw-inputs.json", image_number = 0):
     # folder_save (str) is path to folder where results should be saved
-    # display (Bool) indicates if plots should be prompted
+    # display (bool) indicates if plots should be prompted
+    # draw_input_file (str) is path to input file
     # image_number (int) is the starting number for the images to be saved (in their names)
 
     # Load input file
-    with open('draw-inputs.json') as json_file:
+    with open(draw_input_file) as json_file:
         inputs = json.load(json_file)[0]
 
     # Convert color options into lists to iterate on
@@ -70,14 +72,15 @@ def draw(folder_save, display = False,  image_number = 0):
 
 
 if __name__ == "__main__":
-    # Without any iput, executable saves images in Result folder without ploting them
-    if len(sys.argv) == 1:
-        draw(None)
-    else
-        folder_save = sys.argv[1]:
-        # If save folder is specified, images and inputs are saved within
-        if len(sys.argv) == 2:
-            draw(folder_save)
-        else:
-            display = sys.argv[2]
-            draw(folder_save, display)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-f", "--folder", default=None, type = str,
+                        help="Folder path for result saving (str)")
+    parser.add_argument("-d", "--display", default=False, type = bool,
+                        help="Display plots (bool)")
+    parser.add_argument("-i", "--input", default="draw-inputs.json", type = str,
+                        help="Drawing input path (str)")
+    parser.add_argument("-n", "--number", default=0,
+                        help="Start image number (int)")
+    args = parser.parse_args()
+
+    draw(args.folder, args.display, args.input, int(args.number))

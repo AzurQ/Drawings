@@ -94,14 +94,14 @@ def iterate(z, poly, threshold, n_iterations):
 # Generate save path from folder name
 def generate_result_path(folder_save):
     path = "Results/"
-    input_path = path
+    input_path = "Results/Inputs/"
     if folder_save is not None:
         # Define save paths
+        input_path = path + str(folder_save) + "/Inputs/"
         path = path + str(folder_save) + "/"
-        input_path = input_path + str(folder_save) + "/"
-        # Create paths if they not already exist
-        if not os.path.exists(input_path):
-            os.makedirs(input_path)
+    # Create paths if they not already exist
+    if not os.path.exists(input_path):
+        os.makedirs(input_path)
     return(path, input_path)
 
 # Draw a fractal image from inputs and save image
