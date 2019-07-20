@@ -1,19 +1,21 @@
 import sys
 import os
 import json
+import argparse
 import numpy
-from functions import draw
+from draw import draw
 
 # Draw a fractal from given inputs and random distribution for given inputs
 ## Fixed inputs may be provided as lists - all possibilites are produced
 ## Randomly generated inputs override general fixed inputs
-def random(draw_input_dict, random_intput_dict, folder_save, display = False, image_number = 0):
+def random_draw(draw_input_dict, random_intput_dict, folder_save, display = False, image_number = 0):
     # draw_input_dict (doct) is dictionnary with fixed parameters
     # random_intput_dict (dict) is dictionnary with random parameter distributions
     # folder_save (str) is path to folder where results should be saved
     # display (bool) indicates if plots should be prompted
     # image_number (int) is the starting number for the images to be saved (in their names)
 
+    draw(draw_input_dict, folder_save, display = False, image_number = 0)
 
 
 if __name__ == "__main__":
@@ -38,4 +40,4 @@ if __name__ == "__main__":
     with open(args.random) as random_json_file:
         random_intput_dict = json.load(random_json_file)[0]
 
-    random(draw_input_dict, random_intput_dict, args.folder, args.display, int(args.number))
+    random_draw(draw_input_dict, random_intput_dict, args.folder, args.display, int(args.number))
