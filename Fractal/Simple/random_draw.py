@@ -38,10 +38,10 @@ if __name__ == "__main__":
 
     # Load fixed input file
     with open(args.input) as draw_json_file:
-        draw_input_dict = json.load(draw_json_file)[0]
+        draw_input_dict = json.load(draw_json_file)
 
     # Load random input file
     with open(args.random) as random_json_file:
-        random_input_dict = json.load(random_json_file)[0]
+        random_input_dict = json.load(random_json_file)
 
     random_draw(draw_input_dict, random_input_dict, args.folder, args.display, int(args.number))

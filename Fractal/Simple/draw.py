@@ -82,6 +82,6 @@ if __name__ == "__main__":
 
     # Load input file
     with open(args.input) as json_file:
-        draw_input_dict = json.load(json_file)[0]
+        draw_input_dict = json.load(json_file)
 
     draw(draw_input_dict, args.folder, args.display, int(args.number))

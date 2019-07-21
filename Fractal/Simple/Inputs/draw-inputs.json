@@ -1,40 +1,35 @@
-[
-  {
-    "dimensions": {
-      "x": 300,
-      "y": 200
+{
+  "dimensions": {
+    "x": 300,
+    "y": 200
+  },
+  "scaling_factor": 5,
+  "n_iterations": 100,
+  "colors_max": 5000,
+  "threshold": 2,
+  "polynomial": {
+    "0": {
+      "real": 0.2,
+      "imaginary": 0.8
     },
-    "scaling_factor": 5,
-    "n_iterations": 50,
-    "colors_max": 5000,
-    "threshold": 2,
-    "polynomial": {
-      "0": {
-        "real": 0.2,
-        "imaginary": 0.8
-      },
-      "1": {
-        "real": 0.3
-      },
-      "2": {
-        "real": 0.7
-      },
-      "3": {
-        "real": 1
-      },
-      "4": {
-        "real": 0.3
-      }
+    "1": {
+      "real": 0.3
     },
-    "r_start": 0.78,
-    "r_coef": -0.55,
-    "g_start": 0.9,
-    "g_coef": -0.6,
-    "b_start": 0,
-    "b_coef": 0.8,
-    "speed": 15,
-    "dark2light": true,
-    "upward_shift": 0,
-    "right_shift": 0
-  }
-]
+    "2": {
+      "real": 0.7
+    },
+    "3": {
+      "real": 1
+    }
+  },
+  "r_start": 0.78,
+  "r_coef": -0.55,
+  "g_start": 0.9,
+  "g_coef": -0.6,
+  "b_start": 0,
+  "b_coef": 0.8,
+  "speed": 15,
+  "dark2light": true,
+  "upward_shift": 0,
+  "right_shift": 0
+}
