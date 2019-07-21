@@ -181,7 +181,12 @@ def generate_from_distribution(distribution_dict):
             n = distribution_dict[key]["n"]
             p = distribution_dict[key]["p"]
             samples = distribution_dict[key]["samples"]
-            return(list(numpy.random.binomial(n, p, samples)))
+            return([float(x) for x in list(numpy.random.binomial(n, p, samples))])
+        elif key == "extended_binomial":
+            n = distribution_dict[key]["n"]
+            p = distribution_dict[key]["p"]
+            samples = distribution_dict[key]["samples"]
+            return(extended_binomial(n, p, samples))
         elif key == "uniform":
             low_bound = distribution_dict[key]["low_bound"]
             high_bound = distribution_dict[key]["high_bound"]
@@ -190,6 +195,11 @@ def generate_from_distribution(distribution_dict):
         else:
             print("Distribution not recognized")
             return(None)
+
+
+# Binomial distribution function centered on 0 between -n and n
+def extended_binomial(n, p, samples):
+    return([float(x) - n for x in list(numpy.random.binomial(2 * n, p, samples))])
 
 
 # Generate a sub-drawing_input_dict from a random_input_dict by replacing distributions with their random samples

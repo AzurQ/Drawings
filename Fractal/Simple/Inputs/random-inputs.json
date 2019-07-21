@@ -5,41 +5,41 @@
         "normal": {
           "mean": 0,
           "std": 0.3,
-          "samples": 2
+          "samples": 3
         }
       },
       "imaginary": {
         "normal": {
           "mean": 0,
           "std": 0.3,
-          "samples": 2
+          "samples": 3
         }
       }
     },
     "1": {
       "real": {
-        "uniform": {
-          "low_bound": -3,
-          "high_bound": 3,
-          "samples": 2
+        "extended_binomial": {
+          "n": 5,
+          "p": 0.4,
+          "samples": 3
         }
       }
     },
     "2": {
       "real": {
-        "uniform": {
-          "low_bound": -3,
-          "high_bound": 3,
-          "samples": 2
+        "extended_binomial": {
+          "n": 5,
+          "p": 0.4,
+          "samples": 3
         }
       }
     },
     "3": {
       "real": {
-        "uniform": {
-          "low_bound": -3,
-          "high_bound": 3,
-          "samples": 2
+        "extended_binomial": {
+          "n": 5,
+          "p": 0.4,
+          "samples": 3
         }
       }
     }
