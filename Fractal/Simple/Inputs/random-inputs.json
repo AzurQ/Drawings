@@ -4,8 +4,18 @@
       "0": {
         "real": {
           "normal": {
-            "mean": 0.3,
-            "std": 1
+            "mean": 0,
+            "std": 2,
+            "samples": 2
+          }
+        }
+      },
+      "2": {
+        "real": {
+          "normal": {
+            "mean": 1,
+            "std": 2,
+            "samples": 3
           }
         }
       }

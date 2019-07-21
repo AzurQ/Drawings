@@ -67,8 +67,6 @@ def draw(draw_input_dict, folder_save, display = False, image_number = 0):
                     image_number += 1
 
 
-
-
 if __name__ == "__main__":
     # Read arguments
     parser = argparse.ArgumentParser()

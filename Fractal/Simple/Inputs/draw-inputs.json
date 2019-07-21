@@ -4,9 +4,7 @@
       "x": 300,
       "y": 200
     },
-    "scaling_factor": [
-      7
-    ],
+    "scaling_factor": 5,
     "n_iterations": 50,
     "colors_max": 5000,
     "threshold": 2,

@@ -5,12 +5,14 @@ import json
 from PIL import Image
 from PIL import ImageDraw
 import itertools
+import numpy
 
 # Put an object into a list if not already a list
 def to_list(x):
     if not isinstance(x, list):
         x = [x]
     return(x)
+
 
 # Compute the list of all polynomials defined by cartesian product from a polynomial degree coefficient list
 def list_of_list_transform(list):
@@ -26,6 +28,7 @@ def list_of_list_transform(list):
                 temp_list = temp_list + [x + [value] for x in new_list]
             new_list = temp_list
     return(new_list)
+
 
 # Extract a dictionnary containing polynomial coefficient to a list whose indexes account for degree
 def extract_poly(dict):
@@ -43,6 +46,7 @@ def extract_poly(dict):
         else:
             poly_list[int(key)] = [a for a in to_list(dict[key]["real"])]
     return(poly_list)
+
 
 # Create a color palette from color progression functions
 def create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max):
@@ -82,6 +86,7 @@ def create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dar
 
     return(palette)
 
+
 # Iterate a polynomial from a starting point and return first divergence time from a threshold
 def iterate(z, poly, threshold, n_iterations):
     p = len(poly)
@@ -90,6 +95,7 @@ def iterate(z, poly, threshold, n_iterations):
         if abs(z) > threshold:
             return n
     return None
+
 
 # Generate save path from folder name
 def generate_result_path(folder_save):
@@ -103,6 +109,7 @@ def generate_result_path(folder_save):
     if not os.path.exists(input_path):
         os.makedirs(input_path)
     return(path, input_path)
+
 
 # Draw a fractal image from inputs and save image
 def draw_image(path, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, palette, colors_max, display = False):
@@ -137,6 +144,7 @@ def draw_image(path, image_number, poly, n_iterations, dimensions, threshold, sc
         img.show()
     del d
 
+
 # Save inputs of a given image
 def write_inputs(input_path, poly, input_dict, image_number):
     # Copy input file data
@@ -154,3 +162,79 @@ def write_inputs(input_path, poly, input_dict, image_number):
     # Save input file data
     with open(input_path + str(image_number) + "-draw-inputs.json", 'w') as f:
         json.dump(output_file, f)
+
+
+# Generate random samples from a given distribution
+def generate_from_distribution(distribution_dict):
+    # Remove ill-defined dictionaries
+    if len(distribution_dict) != 1:
+        print("Distribution dictionary is not well defined")
+        return(None)
+    # Supported distribution are normal, binomial, and uniform distributions
+    for key in distribution_dict:
+        if key == "normal":
+            mean = distribution_dict[key]["mean"]
+            std = distribution_dict[key]["std"]
+            samples = distribution_dict[key]["samples"]
+            return(list(numpy.random.normal(mean, std, samples)))
+        elif key == "binomial":
+            n = distribution_dict[key]["n"]
+            p = distribution_dict[key]["p"]
+            samples = distribution_dict[key]["samples"]
+            return(list(numpy.random.binomial(n, p, samples)))
+        elif key == "uniform":
+            low_bound = distribution_dict[key]["low_bound"]
+            high_bound = distribution_dict[key]["high_bound"]
+            samples = distribution_dict[key]["samples"]
+            return(list(numpy.random.uniform(low_bound, high_bound, samples)))
+        else:
+            print("Distribution not recognized")
+            return(None)
+
+
+# Generate a sub-drawing_input_dict from a random_input_dict by replacing distributions with their random samples
+def generate_random_inputs(random_input_dict):
+    randomly_generated_dict = {}
+    # Parse on different dictionary parmeters, and parse within them if nested dictionaries
+    for parameter in random_input_dict:
+        if parameter == "polynomial":
+            if parameter not in randomly_generated_dict:
+                randomly_generated_dict[parameter] = {}
+            # Polynomial are splitted into degree dictionaries
+            for degree in random_input_dict[parameter]:
+                if degree not in randomly_generated_dict[parameter]:
+                    randomly_generated_dict[parameter][degree] = {}
+                # Polynomial coefficients are splitted into real and imaginary part dictionaries
+                for part in random_input_dict[parameter][degree]:
+                    # If distribution is not recognized or ill-defined, override is cancelled
+                    if generate_from_distribution(random_input_dict[parameter][degree][part]) is not None:
+                        randomly_generated_dict[parameter][degree][part] = generate_from_distribution(random_input_dict[parameter][degree][part])
+        elif parameter == "dimensions":
+            if parameter not in randomly_generated_dict:
+                randomly_generated_dict[parameter] = {}
+            # Dimension canvas is splitted into x and y axis dictionnaries
+            for dimension in random_input_dict[parameter]:
+                if generate_from_distribution(random_input_dict[parameter][dimension]) is not None:
+                    randomly_generated_dict[parameter][dimension] = generate_from_distribution(random_input_dict[parameter][dimension])
+        else:
+            if generate_from_distribution(random_input_dict[parameter]) is not None:
+                randomly_generated_dict[parameter] = generate_from_distribution(random_input_dict[parameter])
+    return(randomly_generated_dict)
+
+
+# Override a drawing_input dictionnaries with inputs generated from a random dictionnary inside a sub-dictionnary
+def override(draw_input_dict, random_input_dict):
+    # Parse on different dictionary parmeters, and parse within them if nested dictionaries
+    for parameter in random_input_dict:
+        if parameter == "polynomial":
+            for degree in random_input_dict[parameter]:
+                if degree not in draw_input_dict[parameter]:
+                    draw_input_dict[parameter][degree] = {}
+                for part in random_input_dict[parameter][degree]:
+                    draw_input_dict[parameter][degree][part] = random_input_dict[parameter][degree][part]
+        elif parameter == "dimensions":
+            for dimension in random_input_dict[parameter]:
+                draw_input_dict[parameter][dimension] = random_input_dict[parameter][dimension]
+        else:
+            draw_input_dict[parameter] = random_input_dict[parameter]
+    return(draw_input_dict)
