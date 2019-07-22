@@ -5,14 +5,14 @@
         "normal": {
           "mean": 0,
           "std": 0.3,
-          "samples": 3
+          "samples": 2
         }
       },
       "imaginary": {
         "normal": {
           "mean": 0,
           "std": 0.3,
-          "samples": 3
+          "samples": 2
         }
       }
     },
@@ -21,7 +21,7 @@
         "extended_binomial": {
           "n": 5,
           "p": 0.4,
-          "samples": 3
+          "samples": 2
         }
       }
     },
@@ -30,7 +30,7 @@
         "extended_binomial": {
           "n": 5,
           "p": 0.4,
-          "samples": 3
+          "samples": 2
         }
       }
     },
@@ -39,7 +39,25 @@
         "extended_binomial": {
           "n": 5,
           "p": 0.4,
-          "samples": 3
+          "samples": 2
+        }
+      }
+    },
+    "4": {
+      "real": {
+        "extended_binomial": {
+          "n": 5,
+          "p": 0.4,
+          "samples": 2
+        }
+      }
+    },
+    "5": {
+      "real": {
+        "extended_binomial": {
+          "n": 5,
+          "p": 0.4,
+          "samples": 2
         }
       }
     }

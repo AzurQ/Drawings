@@ -3,14 +3,14 @@
     "x": 300,
     "y": 200
   },
-  "scaling_factor": 5,
+  "scaling_factor": 3,
   "n_iterations": 100,
   "colors_max": 5000,
   "threshold": 2,
   "polynomial": {
     "0": {
       "real": 0.2,
-      "imaginary": 0.8
+      "imaginary": 0.6
     },
     "1": {
       "real": 0.3
@@ -29,7 +29,7 @@
   "b_start": 0,
   "b_coef": 0.8,
   "speed": 15,
-  "dark2light": true,
+  "dark2light": false,
   "upward_shift": 0,
   "right_shift": 0
 }

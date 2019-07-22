@@ -3,15 +3,17 @@ import os
 import json
 import itertools
 import argparse
-from functions import to_list, list_of_list_transform, extract_poly, create_palette, generate_result_path, draw_image, write_inputs
+from functions import to_list, extract_poly, create_palette, generate_result_path, draw_image, write_inputs, create_poly_list
 
 # Draw a fractal from given inputs
 ## Inputs may be provided as lists - all possibilites are produced
-def draw(draw_input_dict, folder_save, display = False, image_number = 0):
-    # draw_input_dict (dict) is dictionnary with all inputs
+def draw(draw_input_dict, folder_save, display = False, image_number = 0, cartesian_poly = True):
+    # draw_input_dict (dict) is dictionary with all inputs
     # folder_save (str) is path to folder where results should be saved
     # display (bool) indicates if plots should be prompted
     # image_number (int) is the starting number for the images to be saved (in their names)
+    # cartesian_poly (bool) indicates if polynomials are considered by taking the cartesian product of all coefficient values
+        ## It is only used for the random_draw.py script which allows to called an unique list of polynomials that would not be converted to its cartesian product
 
     # Convert color options into lists to iterate on
     input_to_convert_list_1 = ["r_start", "r_coef", "g_start", "g_coef", "b_start", "b_coef", "speed", "dark2light", "colors_max"]
@@ -49,10 +51,8 @@ def draw(draw_input_dict, folder_save, display = False, image_number = 0):
                 output_dict["dimensions"] = {"x": dimension_x, "y": dimension_y}
                 dimensions = [dimension_x, dimension_y]
 
-                # Import the dictionnary of polynomial
-                poly_raw_list = extract_poly(draw_input_dict["polynomial"])
-                # Make the list of polynomials implicitely defined in the dictionnary
-                poly_list = list_of_list_transform(poly_raw_list)
+                # Create the list of polynomials to iterate
+                poly_list = create_poly_list(draw_input_dict["polynomial"], cartesian_poly)
 
                 # Iterate for each polynomial
                 for poly in poly_list:
