@@ -3,7 +3,8 @@ import os
 import json
 import itertools
 import argparse
-from functions import to_list, extract_poly, create_palette, generate_result_path, draw_image, write_inputs, create_poly_list
+from progress.bar import Bar
+from functions import to_list, extract_poly, create_palette, generate_result_path, draw_image, write_inputs, create_poly_list, count_plots
 
 # Draw a fractal from given inputs
 ## Inputs may be provided as lists - all possibilites are produced
@@ -14,6 +15,9 @@ def draw(draw_input_dict, folder_save, display = False, image_number = 0, cartes
     # image_number (int) is the starting number for the images to be saved (in their names)
     # cartesian_poly (bool) indicates if polynomials are considered by taking the cartesian product of all coefficient values
         ## It is only used for the random_draw.py script which allows to called an unique list of polynomials that would not be converted to its cartesian product
+
+    # Define progress bar
+    progress = Bar('Processing', max = count_plots(draw_input_dict, cartesian_poly))
 
     # Convert color options into lists to iterate on
     input_to_convert_list_1 = ["r_start", "r_coef", "g_start", "g_coef", "b_start", "b_coef", "speed", "dark2light", "colors_max"]
@@ -65,6 +69,10 @@ def draw(draw_input_dict, folder_save, display = False, image_number = 0, cartes
                     write_inputs(input_path, poly, output_dict, image_number)
                     # Update image number (int) for saving
                     image_number += 1
+                    # Update progress bar
+                    progress.next()
+
+    progress.finish()
 
 
 if __name__ == "__main__":

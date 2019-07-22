@@ -321,3 +321,24 @@ def override(draw_input_dict, random_input_dict):
         else:
             draw_input_dict[parameter] = random_input_dict[parameter]
     return(draw_input_dict)
+
+
+# Compute the total number of drawings to plot
+def count_plots(input_dict, cartesian_poly = True):
+    n = 1
+    # Compute the size of the cartesian product of all parameters
+    for parameter in input_dict:
+        if parameter == "dimensions":
+            for dimension in input_dict["dimensions"]:
+                n *= len(to_list(input_dict["dimensions"][dimension]))
+        elif parameter == "polynomial":
+            if cartesian_poly:
+                for degree in input_dict["polynomial"]:
+                    for part in input_dict["polynomial"][degree]:
+                        n *= len(to_list(input_dict["polynomial"][degree][part]))
+            # If polynomials are randomly generated without cartesian product, the global_poly_number is used
+            else:
+                n *= find_poly_dict_max_length(input_dict["polynomial"])
+        else:
+            n *= len(to_list(input_dict[parameter]))
+    return(n)
