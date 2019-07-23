@@ -182,8 +182,11 @@ def generate_result_path(folder_save):
         os.makedirs(input_path)
     return(path, input_path)
 
+
+# Indicates if an image already exists
 def exist(image_number, path):
     return(os.path.exists(path + str(image_number) + ".png"))
+
 
 # Draw a fractal image from inputs and save image
 def draw_image(path, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, palette, colors_max, display = False):
