@@ -4,36 +4,37 @@ import json
 import itertools
 import argparse
 from progress.bar import Bar
-from functions import to_list, extract_poly, create_palette, generate_result_path, draw_image, write_inputs, create_poly_list, count_plots, exist
+from functions import to_list, extract_poly, create_palette, generate_result_path, draw_image, write_inputs, create_poly_list, create_color_palette_list, count_plots, exist, color_params
 
 # Draw a fractal from given inputs
 ## Inputs may be provided as lists - all possibilites are produced
-def draw(draw_input_dict, folder_save, display = False, continued = False, image_number = 0, cartesian_poly = True):
+def draw(draw_input_dict, folder_save, display = False, continued = False, image_number = 0, cartesian_poly = True, cartesian_color_palette = True):
     # draw_input_dict (dict) is dictionary with all inputs
     # folder_save (str) is path to folder where results should be saved
     # display (bool) indicates if plots should be prompted
     # continued (bool) indicates if draw should be restarted or if should continued from already existing plots
     # image_number (int) is the starting number for the images to be saved (in their names)
     # cartesian_poly (bool) indicates if polynomials are considered by taking the cartesian product of all coefficient values
-        ## It is only used for the random_draw.py script which allows to called an unique list of polynomials that would not be converted to its cartesian product
+        ## It is only used for the random_draw.py script which allows to call an unique list of polynomials that would not be converted to its cartesian product
+    # cartesian_color_palette (bool) indicates if color palette parameters are considered by taking the cartesian product of all coefficient values
+        ## It is only used for the random_draw.py script which allows to call an unique list of color palettes that would not be converted to its cartesian product
 
     # Define progress bar
-    progress = Bar('Processing', max = count_plots(draw_input_dict, cartesian_poly))
+    progress = Bar('Processing', max = count_plots(draw_input_dict, cartesian_poly, cartesian_color_palette))
 
     # Generate save paths
     path, input_path = generate_result_path(folder_save)
 
     # Convert color options into lists to iterate on
-    input_to_convert_list_1 = ["r_start", "r_coef", "g_start", "g_coef", "b_start", "b_coef", "speed", "dark2light", "colors_max"]
-    for item in input_to_convert_list_1:
+    for item in color_params:
         draw_input_dict[item] = to_list(draw_input_dict[item])
 
     # Iterate for color options in input file
-    for r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max in itertools.product(draw_input_dict["r_start"], draw_input_dict["r_coef"], draw_input_dict["g_start"], draw_input_dict["g_coef"], draw_input_dict["b_start"], draw_input_dict["b_coef"], draw_input_dict["speed"], draw_input_dict["dark2light"], draw_input_dict["colors_max"]):
+    for r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max in create_color_palette_list(draw_input_dict, cartesian_color_palette):
 
         # Create the graphical palette
         palette = create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max)
-        
+
         # Dict used for saving/writing specific input data
         output_dict = {"r_start": r_start, "r_coef": r_coef, "g_start": g_start, "g_coef": g_coef, "b_start": b_start, "b_coef": b_coef, "speed": speed, "dark2light": dark2light, "colors_max": colors_max}
 
@@ -63,9 +64,10 @@ def draw(draw_input_dict, folder_save, display = False, continued = False, image
 
                 # Create the list of polynomials to iterate
                 poly_list = create_poly_list(draw_input_dict["polynomial"], cartesian_poly)
-
+                
                 # Iterate for each polynomial
                 for poly in poly_list:
+
                     # If continued, image should not already exist
                     if not continued or not exist(image_number, path):
                         # Plot and save image

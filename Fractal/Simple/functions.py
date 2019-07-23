@@ -6,6 +6,10 @@ from PIL import ImageDraw
 import itertools
 import numpy
 
+# List of graphical color parameters
+color_params = ["r_start", "r_coef", "g_start", "g_coef", "b_start", "b_coef", "speed", "dark2light", "colors_max"]
+
+
 # Put an object into a list if not already a list
 def to_list(x):
     if not isinstance(x, list):
@@ -53,7 +57,7 @@ def find_poly_dict_max_length(poly_dict):
     for degree in poly_dict:
         for part in poly_dict[degree]:
             if len(to_list(poly_dict[degree][part])) > n :
-                n = len(poly_dict[degree][part])
+                n = len(to_list(poly_dict[degree][part]))
     return(n)
 
 
@@ -86,7 +90,7 @@ def poly_dict_to_complex_dict(poly_dict):
     return(complex_dict)
 
 
-# Create the polynomial list from the polynomial dictionary
+# Create the polynomial list from polynomial dictionary
 def create_poly_list(poly_dict, cartesian_poly):
     # Normal pathway of drawing script
     if cartesian_poly:
@@ -94,7 +98,7 @@ def create_poly_list(poly_dict, cartesian_poly):
         poly_raw_list = extract_poly(poly_dict)
         # Make the list of polynomials implicitely defined in the dictionary
         poly_list = cartesian_product(poly_raw_list)
-    # If polynomials are generated without cartesian product by only taking every combinaison in each coefficient
+    # If polynomials are generated without cartesian product by only taking term-to-term combinaisons
     else:
         # Prepare output list with size determined by global_poly_number that may be found back in the input dictionary
         global_poly_number = find_poly_dict_max_length(poly_dict)
@@ -107,16 +111,61 @@ def create_poly_list(poly_dict, cartesian_poly):
         for degree in complex_dict:
             # If some degree coefficients are not specified, 0 are added instead
             if len(poly_list[0]) <= int(degree):
-                poly_list = [x + [to_list(0) for _ in range(int(degree) - len(poly_list) + 1)] for x in poly_list]
-            # If only one complex number is specified for a coefficient, it is distributed for all polynomials
-            if len(complex_dict[degree]) == 1:
-                poly_list = [x + to_list(complex_dict[degree][0]) for x in poly_list]
-            # For randomly generated complex coefficient lists, each value is distributed to a different polynomial rather than making cartesian product
-            elif len(complex_dict[degree]) == global_poly_number:
-                poly_list = [poly_list[i] + to_list(complex_dict[degree][i]) for i in range(global_poly_number)]
-            else:
-                raise Exception("For non-cartesian product polynomial generation, all polynomial coefficient in fixed input file should be single values and not lists.")
+                poly_list = [x + [0 for _ in range(int(degree) - len(poly_list[0]))] for x in poly_list]
+            # Distribute polynomial coefficient list to existing list
+            poly_list = distribute_list(poly_list, complex_dict[degree], global_poly_number)
     return(poly_list)
+
+
+# Extract color palette parameter subdictionary from an input dictionary
+def extract_color_palette_dict(dict):
+    color_palette_dict = {}
+    for parameter in dict:
+        if parameter in color_params:
+            color_palette_dict[parameter] = dict[parameter]
+    return(color_palette_dict)
+
+
+# Return the maximum length of a coefficient list of a color palette subdictionary
+def find_color_palette_dict_max_length(color_palette_dict):
+    n = 0
+    for parameter in color_palette_dict:
+        if len(to_list(color_palette_dict[parameter])) > n:
+            n = len(to_list(color_palette_dict[parameter]))
+    return(n)
+
+
+# Distribute a new list at the end of all elements of a list of lists
+def distribute_list(list_of_lists, new_list, theorical_list_length):
+    # If only one parameter is specified for a coefficient, it is distributed for all lists
+    if len(new_list) == 1:
+        list_of_lists = [x + to_list(new_list[0]) for x in list_of_lists]
+        return(list_of_lists)
+    # For randomly generated parameters, each value is distributed to a different list rather than making cartesian product
+    elif len(new_list) == theorical_list_length:
+        list_of_lists = [list_of_lists[i] + to_list(new_list[i]) for i in range(theorical_list_length)]
+        return(list_of_lists)
+    else:
+        raise Exception("For non-cartesian product parameters generation (polynomial and/or color palette), all parameters in fixed input file should be single values and not lists.")
+
+
+# Create the color palette list from input subdictionary
+def create_color_palette_list(draw_input_dict, cartesian_color_palette = True):
+    # Normal pathway of drawing script
+    if cartesian_color_palette:
+        return(itertools.product(draw_input_dict["r_start"], draw_input_dict["r_coef"], draw_input_dict["g_start"], draw_input_dict["g_coef"], draw_input_dict["b_start"], draw_input_dict["b_coef"], draw_input_dict["speed"], draw_input_dict["dark2light"], draw_input_dict["colors_max"]))
+    # If color palettes are generated without cartesian product by only taking term-to-term combinaisons
+    else:
+        # Prepare output list with size determined by global_color_palette_number that may be found back in the input dictionary
+        color_palette_dict = extract_color_palette_dict(draw_input_dict)
+        global_color_palette_number = find_color_palette_dict_max_length(color_palette_dict)
+        color_palette_list = [[] for _ in range(global_color_palette_number)]
+
+        # Make the color palette list explicitely defined in the dictionary
+        for color_param in color_params:
+            color_palette_list = distribute_list(color_palette_list, color_palette_dict[color_param], global_color_palette_number)
+
+    return(color_palette_list)
 
 
 # Create a color palette from color progression functions
@@ -240,8 +289,8 @@ def write_inputs(input_path, poly, input_dict, image_number):
 
 
 # Generate random samples from a given distribution
-## If global_poly_number is not None, generate samples with given sample number
-def generate_from_distribution(distribution_dict, global_poly_number = None):
+## If global_sample_number is not None, generate samples with given sample number
+def generate_from_distribution(distribution_dict, global_sample_number = None):
     # Remove ill-defined dictionaries
     if len(distribution_dict) != 1:
         print("Distribution dictionary is not well defined")
@@ -251,22 +300,22 @@ def generate_from_distribution(distribution_dict, global_poly_number = None):
         if key == "normal":
             mean = distribution_dict[key]["mean"]
             std = distribution_dict[key]["std"]
-            samples = distribution_dict[key]["samples"] if global_poly_number is None else global_poly_number
+            samples = distribution_dict[key]["samples"] if global_sample_number is None else global_sample_number
             return(list(numpy.random.normal(mean, std, samples)))
         elif key == "binomial":
             n = distribution_dict[key]["n"]
             p = distribution_dict[key]["p"]
-            samples = distribution_dict[key]["samples"] if global_poly_number is None else global_poly_number
+            samples = distribution_dict[key]["samples"] if global_sample_number is None else global_sample_number
             return([float(x) for x in list(numpy.random.binomial(n, p, samples))])
         elif key == "extended_binomial":
             n = distribution_dict[key]["n"]
             p = distribution_dict[key]["p"]
-            samples = distribution_dict[key]["samples"] if global_poly_number is None else global_poly_number
+            samples = distribution_dict[key]["samples"] if global_sample_number is None else global_sample_number
             return(extended_binomial(n, p, samples))
         elif key == "uniform":
             low_bound = distribution_dict[key]["low_bound"]
             high_bound = distribution_dict[key]["high_bound"]
-            samples = distribution_dict[key]["samples"] if global_poly_number is None else global_poly_number
+            samples = distribution_dict[key]["samples"] if global_sample_number is None else global_sample_number
             return(list(numpy.random.uniform(low_bound, high_bound, samples)))
         else:
             print("Distribution not recognized")
@@ -279,7 +328,7 @@ def extended_binomial(n, p, samples):
 
 
 # Generate a sub-drawing_input_dict from a random_input_dict by replacing distributions with their random samples
-def generate_random_inputs(random_input_dict, global_poly_number = None):
+def generate_random_inputs(random_input_dict, global_poly_number = None, global_color_palette_number = None):
     randomly_generated_dict = {}
     # Parse on different dictionary parmeters, and parse within them if nested dictionaries
     for parameter in random_input_dict:
@@ -302,6 +351,9 @@ def generate_random_inputs(random_input_dict, global_poly_number = None):
             for dimension in random_input_dict[parameter]:
                 if generate_from_distribution(random_input_dict[parameter][dimension], global_poly_number) is not None:
                     randomly_generated_dict[parameter][dimension] = generate_from_distribution(random_input_dict[parameter][dimension], global_poly_number)
+        elif parameter in color_params:
+            if generate_from_distribution(random_input_dict[parameter], global_color_palette_number) is not None:
+                randomly_generated_dict[parameter] = generate_from_distribution(random_input_dict[parameter], global_color_palette_number)
         else:
             if generate_from_distribution(random_input_dict[parameter], global_poly_number) is not None:
                 randomly_generated_dict[parameter] = generate_from_distribution(random_input_dict[parameter], global_poly_number)
@@ -327,8 +379,10 @@ def override(draw_input_dict, random_input_dict):
 
 
 # Compute the total number of drawings to plot
-def count_plots(input_dict, cartesian_poly = True):
+def count_plots(input_dict, cartesian_poly = True, cartesian_color_palette = True):
     n = 1
+    # Flag to only count once color palette parameters when used in non-cartesian random generation
+    color_palette_ok_flag = False
     # Compute the size of the cartesian product of all parameters
     for parameter in input_dict:
         if parameter == "dimensions":
@@ -342,6 +396,10 @@ def count_plots(input_dict, cartesian_poly = True):
             # If polynomials are randomly generated without cartesian product, the global_poly_number is used
             else:
                 n *= find_poly_dict_max_length(input_dict["polynomial"])
+        elif (parameter in color_params) and not cartesian_color_palette:
+            if not color_palette_ok_flag:
+                n *= find_color_palette_dict_max_length(extract_color_palette_dict(input_dict))
+                color_palette_ok_flag = True
         else:
             n *= len(to_list(input_dict[parameter]))
     return(n)
