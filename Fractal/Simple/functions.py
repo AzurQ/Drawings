@@ -124,22 +124,22 @@ def create_poly_list(poly_dict, cartesian_poly):
 def create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max):
     # Remove unfeasible combinations of color palette (i.e. RGB values out of [0:255])
     if (r_start < 0) or (r_start > 1):
-        print("r_start is ill-defined")
+        # print("\nr_start is ill-defined")
         return(None)
     if (g_start < 0) or (g_start > 1):
-        print("g_start is ill-defined")
+        # print("\ng_start is ill-defined")
         return(None)
     if (b_start < 0) or (b_start > 1):
-        print("b_start is ill-defined")
+        # print("\nb_start is ill-defined")
         return(None)
     if (r_start + r_coef < 0) or (r_start + r_coef > 1):
-        print("r_coef is ill-defined")
+        # print("\nr_coef is ill-defined")
         return(None)
     if (g_start + g_coef < 0) or (g_start + g_coef > 1):
-        print("g_coef is ill-defined")
+        # print("\ng_coef is ill-defined")
         return(None)
     if (b_start + b_coef < 0) or (b_start + b_coef > 1):
-        print("b_coef is ill-defined")
+        # print("\nb_coef is ill-defined")
         return(None)
 
     # Initialize color palette
@@ -148,9 +148,9 @@ def create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dar
     for i in range(colors_max):
         # Define progression of color palette from one side to another (i.e. how fast colors are evolving)
         if dark2light:
-            f = 1 + (float(i) / colors_max - 1) ** speed
+            f = 1 - abs((float(i) / colors_max - 1) ** speed)
         else:
-            f = - (float(i) / colors_max - 1) ** speed
+            f = abs((float(i) / colors_max - 1) ** speed)
 
         # Define color palette coefficients from functions for each RGB coefficient
         r, g, b = colorsys.hsv_to_rgb(r_start + f * r_coef, g_start + f * g_coef, b_start + f * b_coef)
@@ -182,6 +182,8 @@ def generate_result_path(folder_save):
         os.makedirs(input_path)
     return(path, input_path)
 
+def exist(image_number, path):
+    return(os.path.exists(path + str(image_number) + ".png"))
 
 # Draw a fractal image from inputs and save image
 def draw_image(path, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, palette, colors_max, display = False):

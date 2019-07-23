@@ -4,20 +4,24 @@ import json
 import itertools
 import argparse
 from progress.bar import Bar
-from functions import to_list, extract_poly, create_palette, generate_result_path, draw_image, write_inputs, create_poly_list, count_plots
+from functions import to_list, extract_poly, create_palette, generate_result_path, draw_image, write_inputs, create_poly_list, count_plots, exist
 
 # Draw a fractal from given inputs
 ## Inputs may be provided as lists - all possibilites are produced
-def draw(draw_input_dict, folder_save, display = False, image_number = 0, cartesian_poly = True):
+def draw(draw_input_dict, folder_save, display = False, continued = False, image_number = 0, cartesian_poly = True):
     # draw_input_dict (dict) is dictionary with all inputs
     # folder_save (str) is path to folder where results should be saved
     # display (bool) indicates if plots should be prompted
+    # continued (bool) indicates if draw should be restarted or if should continued from already existing plots
     # image_number (int) is the starting number for the images to be saved (in their names)
     # cartesian_poly (bool) indicates if polynomials are considered by taking the cartesian product of all coefficient values
         ## It is only used for the random_draw.py script which allows to called an unique list of polynomials that would not be converted to its cartesian product
 
     # Define progress bar
     progress = Bar('Processing', max = count_plots(draw_input_dict, cartesian_poly))
+
+    # Generate save paths
+    path, input_path = generate_result_path(folder_save)
 
     # Convert color options into lists to iterate on
     input_to_convert_list_1 = ["r_start", "r_coef", "g_start", "g_coef", "b_start", "b_coef", "speed", "dark2light", "colors_max"]
@@ -34,8 +38,10 @@ def draw(draw_input_dict, folder_save, display = False, image_number = 0, cartes
         output_dict = {"r_start": r_start, "r_coef": r_coef, "g_start": g_start, "g_coef": g_coef, "b_start": b_start, "b_coef": b_coef, "speed": speed, "dark2light": dark2light, "colors_max": colors_max}
 
         # Some color options may be incompatible - they are not considered
-        if palette is not None:
-
+        if palette is None:
+            # Update progress bar anyway to keep track
+            progress.next()
+        else:
             # Convert graphical options into lists to iterate on
             draw_input_dict["dimensions"]["x"] = to_list(draw_input_dict["dimensions"]["x"])
             draw_input_dict["dimensions"]["y"] = to_list(draw_input_dict["dimensions"]["y"])
@@ -60,13 +66,12 @@ def draw(draw_input_dict, folder_save, display = False, image_number = 0, cartes
 
                 # Iterate for each polynomial
                 for poly in poly_list:
-
-                    # Generate save paths
-                    path, input_path = generate_result_path(folder_save)
-                    # Plot and save image
-                    draw_image(path, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, palette, colors_max, display)
-                    # Save image input data
-                    write_inputs(input_path, poly, output_dict, image_number)
+                    # If continued, image should not already exist
+                    if not continued or not exist(image_number, path):
+                        # Plot and save image
+                        draw_image(path, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, palette, colors_max, display)
+                        # Save image input data
+                        write_inputs(input_path, poly, output_dict, image_number)
                     # Update image number (int) for saving
                     image_number += 1
                     # Update progress bar
@@ -86,10 +91,12 @@ if __name__ == "__main__":
                         help="Drawing input path (str)")
     parser.add_argument("-n", "--number", default=0,
                         help="Start image number (int)")
+    parser.add_argument("-c", "--continued", default=False, type = bool,
+                        help="If image number already exists, pass (bool)")
     args = parser.parse_args()
 
     # Load input file
     with open(args.input) as json_file:
         draw_input_dict = json.load(json_file)
 
-    draw(draw_input_dict, args.folder, args.display, int(args.number))
+    draw(draw_input_dict, args.folder, args.display, args.continued, int(args.number))
