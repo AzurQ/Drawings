@@ -33,7 +33,7 @@ def draw(draw_input_dict, folder_save, display = False, continued = False, image
 
         # Create the graphical palette
         palette = create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max)
-
+        
         # Dict used for saving/writing specific input data
         output_dict = {"r_start": r_start, "r_coef": r_coef, "g_start": g_start, "g_coef": g_coef, "b_start": b_start, "b_coef": b_coef, "speed": speed, "dark2light": dark2light, "colors_max": colors_max}
 

@@ -1,6 +1,5 @@
 import sys
 import os
-import colorsys
 import json
 from PIL import Image
 from PIL import ImageDraw
@@ -153,9 +152,8 @@ def create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dar
             f = abs((float(i) / colors_max - 1) ** speed)
 
         # Define color palette coefficients from functions for each RGB coefficient
-        r, g, b = colorsys.hsv_to_rgb(r_start + f * r_coef, g_start + f * g_coef, b_start + f * b_coef)
+        r, g, b = r_start + f * r_coef, g_start + f * g_coef, b_start + f * b_coef
         palette[i] = (int(r*255), int(g*255), int(b*255))
-
     return(palette)
 
 

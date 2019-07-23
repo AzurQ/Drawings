@@ -21,7 +21,7 @@ def random_draw(draw_input_dict, random_input_dict, folder_save, display = False
     new_input_dict = override(draw_input_dict, generate_random_inputs(random_input_dict, global_poly_number))
 
     # draw function is called with generated inputs
-    draw(new_input_dict, folder_save, display = False, image_number = 0, cartesian_poly = (global_poly_number is None))
+    draw(new_input_dict, folder_save, display, image_number, cartesian_poly = (global_poly_number is None))
 
 
 if __name__ == "__main__":

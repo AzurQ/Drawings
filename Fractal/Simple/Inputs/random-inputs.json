@@ -1,65 +1,58 @@
 {
-  "polynomial": {
-    "0": {
-      "real": {
-        "normal": {
-          "mean": 0,
-          "std": 0.3,
-          "samples": 2
-        }
-      },
-      "imaginary": {
-        "normal": {
-          "mean": 0,
-          "std": 0.3,
-          "samples": 2
-        }
-      }
-    },
-    "1": {
-      "real": {
-        "extended_binomial": {
-          "n": 5,
-          "p": 0.4,
-          "samples": 2
-        }
-      }
-    },
-    "2": {
-      "real": {
-        "extended_binomial": {
-          "n": 5,
-          "p": 0.4,
-          "samples": 2
-        }
-      }
-    },
-    "3": {
-      "real": {
-        "extended_binomial": {
-          "n": 5,
-          "p": 0.4,
-          "samples": 2
-        }
-      }
-    },
-    "4": {
-      "real": {
-        "extended_binomial": {
-          "n": 5,
-          "p": 0.4,
-          "samples": 2
-        }
-      }
-    },
-    "5": {
-      "real": {
-        "extended_binomial": {
-          "n": 5,
-          "p": 0.4,
-          "samples": 2
-        }
-      }
+  "r_start": {
+    "uniform": {
+      "low_bound": 0,
+      "high_bound": 1,
+      "samples": 2
+    }
+  },
+  "r_coef": {
+    "uniform": {
+      "low_bound": -1,
+      "high_bound": 1,
+      "samples": 2
+    }
+  },
+  "g_start": {
+    "uniform": {
+      "low_bound": 0,
+      "high_bound": 1,
+      "samples": 2
+    }
+  },
+  "g_coef": {
+    "uniform": {
+      "low_bound": -1,
+      "high_bound": 1,
+      "samples": 2
+    }
+  },
+  "b_start": {
+    "uniform": {
+      "low_bound": 0,
+      "high_bound": 1,
+      "samples": 2
+    }
+  },
+  "b_coef": {
+    "uniform": {
+      "low_bound": -1,
+      "high_bound": 1,
+      "samples": 2
+    }
+  },
+  "speed": {
+    "binomial": {
+      "p": 0.5,
+      "n": 15,
+      "samples": 2
+    }
+  },
+  "dark2light": {
+    "binomial": {
+      "n": 1,
+      "p": 0.5,
+      "samples": 2
     }
   }
 }
