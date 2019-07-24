@@ -46,12 +46,12 @@ def draw(draw_input_dict, folder_save, display = False, continued = False, image
             # Convert graphical options into lists to iterate on
             draw_input_dict["dimensions"]["x"] = to_list(draw_input_dict["dimensions"]["x"])
             draw_input_dict["dimensions"]["y"] = to_list(draw_input_dict["dimensions"]["y"])
-            input_to_convert_list_2 = ["n_iterations", "threshold", "scaling_factor", "right_shift", "upward_shift"]
+            input_to_convert_list_2 = ["n_iterations", "threshold", "scaling_factor", "right_shift", "upward_shift", "rotation"]
             for item in input_to_convert_list_2:
                 draw_input_dict[item] = to_list(draw_input_dict[item])
 
             # Iterate for graphical options in input file
-            for n_iterations, threshold, scaling_factor, right_shift, upward_shift, dimension_x, dimension_y in itertools.product(draw_input_dict["n_iterations"], draw_input_dict["threshold"], draw_input_dict["scaling_factor"], draw_input_dict["right_shift"], draw_input_dict["upward_shift"], draw_input_dict["dimensions"]["x"], draw_input_dict["dimensions"]["y"]):
+            for n_iterations, threshold, scaling_factor, right_shift, upward_shift, rotation, dimension_x, dimension_y in itertools.product(draw_input_dict["n_iterations"], draw_input_dict["threshold"], draw_input_dict["scaling_factor"], draw_input_dict["right_shift"], draw_input_dict["upward_shift"], draw_input_dict["rotation"], draw_input_dict["dimensions"]["x"], draw_input_dict["dimensions"]["y"]):
 
                 # Update dict used for saving/writing specific input data
                 output_dict["n_iterations"] = n_iterations
@@ -59,6 +59,7 @@ def draw(draw_input_dict, folder_save, display = False, continued = False, image
                 output_dict["scaling_factor"] = scaling_factor
                 output_dict["right_shift"] = right_shift
                 output_dict["upward_shift"] = upward_shift
+                output_dict["rotation"] = rotation
                 output_dict["dimensions"] = {"x": dimension_x, "y": dimension_y}
                 dimensions = [dimension_x, dimension_y]
 
@@ -71,7 +72,7 @@ def draw(draw_input_dict, folder_save, display = False, continued = False, image
                     # If continued, image should not already exist
                     if not continued or not exist(image_number, path):
                         # Plot and save image
-                        draw_image(path, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, palette, colors_max, display)
+                        draw_image(path, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, rotation, palette, colors_max, display)
                         # Save image input data
                         write_inputs(input_path, poly, output_dict, image_number)
                     # Update image number (int) for saving

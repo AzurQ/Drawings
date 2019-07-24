@@ -2,68 +2,57 @@
   "r_start": {
     "uniform": {
       "low_bound": 0,
-      "high_bound": 0.5,
-      "samples": 2
+      "high_bound": 1,
+      "samples": 1
     }
   },
   "r_coef": {
     "uniform": {
-      "low_bound": 0,
-      "high_bound": 0.5,
-      "samples": 2
+      "low_bound": -1,
+      "high_bound": 1,
+      "samples": 1
     }
   },
   "g_start": {
     "uniform": {
       "low_bound": 0,
-      "high_bound": 0.5,
-      "samples": 2
+      "high_bound": 1,
+      "samples": 1
     }
   },
   "g_coef": {
     "uniform": {
-      "low_bound": 0,
-      "high_bound": 0.5,
-      "samples": 2
+      "low_bound": -1,
+      "high_bound": 1,
+      "samples": 1
     }
   },
   "b_start": {
     "uniform": {
       "low_bound": 0,
-      "high_bound": 0.5,
-      "samples": 2
+      "high_bound": 1,
+      "samples": 1
     }
   },
   "b_coef": {
     "uniform": {
-      "low_bound": 0,
-      "high_bound": 0.5,
-      "samples": 2
+      "low_bound": -1,
+      "high_bound": 1,
+      "samples": 1
     }
   },
   "speed": {
     "binomial": {
       "p": 0.5,
       "n": 15,
-      "samples": 2
+      "samples": 1
     }
   },
   "dark2light": {
     "binomial": {
       "n": 1,
       "p": 0.5,
-      "samples": 2
-    }
-  },
-  "polynomial": {
-    "10": {
-      "real": {
-        "uniform": {
-          "low_bound": -3,
-          "high_bound": 3,
-          "samples": 2
-        }
-      }
+      "samples": 1
     }
   }
 }

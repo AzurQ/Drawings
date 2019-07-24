@@ -6,6 +6,7 @@ from PIL import Image
 from PIL import ImageDraw
 import itertools
 import numpy
+from math import cos, sin, pi
 
 # List of graphical color parameters
 color_params = ["r_start", "r_coef", "g_start", "g_coef", "b_start", "b_coef", "speed", "dark2light", "colors_max", "color_system"]
@@ -243,7 +244,7 @@ def exist(image_number, path):
 
 
 # Draw a fractal image from inputs and save image
-def draw_image(path, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, palette, colors_max, display = False):
+def draw_image(path, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, rotation, palette, colors_max, display = False):
 
     # Define center of the image
     center = (scaling_factor / 2, (scaling_factor / 2) * dimensions[1]/dimensions[0])
@@ -256,7 +257,8 @@ def draw_image(path, image_number, poly, n_iterations, dimensions, threshold, sc
     for x in range(dimensions[0]):
         for y in range(dimensions[1]):
             # Define starting point
-            z = complex(x * scaling_factor / dimensions[0] - center[0] - right_shift, y * scaling_factor / dimensions[0] - center[1] + upward_shift)
+            z = complex(x * scaling_factor / dimensions[0] - center[0] - right_shift, y * scaling_factor / dimensions[0] - center[1] + upward_shift) * complex(cos(rotation * pi / 180), sin(rotation * pi / 180))
+
             # Return convergence value
             n = iterate(z, poly, threshold, n_iterations)
 

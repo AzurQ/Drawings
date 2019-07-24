@@ -8,17 +8,16 @@
     ]
   },
   "scaling_factor": [
-    4
+    2.5
   ],
   "n_iterations": [
     100
   ],
   "colors_max": [
-    5000
+    500
   ],
   "threshold": [
-    1,
-    2
+    1
   ],
   "polynomial": {
     "0": {
@@ -69,6 +68,9 @@
     0
   ],
   "right_shift": [
+    0
+  ],
+  "rotation": [
     0
   ]
 }
