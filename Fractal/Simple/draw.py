@@ -30,13 +30,13 @@ def draw(draw_input_dict, folder_save, display = False, continued = False, image
         draw_input_dict[item] = to_list(draw_input_dict[item])
 
     # Iterate for color options in input file
-    for r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max in create_color_palette_list(draw_input_dict, cartesian_color_palette):
+    for r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max, color_system in create_color_palette_list(draw_input_dict, cartesian_color_palette):
 
         # Create the graphical palette
-        palette = create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max)
+        palette = create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max, color_system)
 
         # Dict used for saving/writing specific input data
-        output_dict = {"r_start": r_start, "r_coef": r_coef, "g_start": g_start, "g_coef": g_coef, "b_start": b_start, "b_coef": b_coef, "speed": speed, "dark2light": dark2light, "colors_max": colors_max}
+        output_dict = {"r_start": r_start, "r_coef": r_coef, "g_start": g_start, "g_coef": g_coef, "b_start": b_start, "b_coef": b_coef, "speed": speed, "dark2light": dark2light, "colors_max": colors_max, "color_system": color_system}
 
         # Some color options may be incompatible - they are not considered
         if palette is None:
@@ -64,7 +64,7 @@ def draw(draw_input_dict, folder_save, display = False, continued = False, image
 
                 # Create the list of polynomials to iterate
                 poly_list = create_poly_list(draw_input_dict["polynomial"], cartesian_poly)
-                
+
                 # Iterate for each polynomial
                 for poly in poly_list:
 

@@ -1,13 +1,14 @@
 import sys
 import os
 import json
+import colorsys
 from PIL import Image
 from PIL import ImageDraw
 import itertools
 import numpy
 
 # List of graphical color parameters
-color_params = ["r_start", "r_coef", "g_start", "g_coef", "b_start", "b_coef", "speed", "dark2light", "colors_max"]
+color_params = ["r_start", "r_coef", "g_start", "g_coef", "b_start", "b_coef", "speed", "dark2light", "colors_max", "color_system"]
 
 
 # Put an object into a list if not already a list
@@ -153,7 +154,7 @@ def distribute_list(list_of_lists, new_list, theorical_list_length):
 def create_color_palette_list(draw_input_dict, cartesian_color_palette = True):
     # Normal pathway of drawing script
     if cartesian_color_palette:
-        return(itertools.product(draw_input_dict["r_start"], draw_input_dict["r_coef"], draw_input_dict["g_start"], draw_input_dict["g_coef"], draw_input_dict["b_start"], draw_input_dict["b_coef"], draw_input_dict["speed"], draw_input_dict["dark2light"], draw_input_dict["colors_max"]))
+        return(itertools.product(draw_input_dict["r_start"], draw_input_dict["r_coef"], draw_input_dict["g_start"], draw_input_dict["g_coef"], draw_input_dict["b_start"], draw_input_dict["b_coef"], draw_input_dict["speed"], draw_input_dict["dark2light"], draw_input_dict["colors_max"], draw_input_dict["color_system"]))
     # If color palettes are generated without cartesian product by only taking term-to-term combinaisons
     else:
         # Prepare output list with size determined by global_color_palette_number that may be found back in the input dictionary
@@ -169,7 +170,7 @@ def create_color_palette_list(draw_input_dict, cartesian_color_palette = True):
 
 
 # Create a color palette from color progression functions
-def create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max):
+def create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max, color_system):
     # Remove unfeasible combinations of color palette (i.e. RGB values out of [0:255])
     if (r_start < 0) or (r_start > 1):
         # print("\nr_start is ill-defined")
@@ -201,7 +202,13 @@ def create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dar
             f = abs((float(i) / colors_max - 1) ** speed)
 
         # Define color palette coefficients from functions for each RGB coefficient
-        r, g, b = r_start + f * r_coef, g_start + f * g_coef, b_start + f * b_coef
+        if color_system == "rgb" or color_system == "RGB":
+            r, g, b = r_start + f * r_coef, g_start + f * g_coef, b_start + f * b_coef
+        # If HSV system is used, red codes for hue, green for saturation, and blue for value
+        elif color_system == "hsv" or color_system == "HSV":
+            r, g, b = colorsys.hsv_to_rgb(r_start + f * r_coef, g_start + f * g_coef, b_start + f * b_coef)
+        else:
+            raise Exception("Color system is not defined. Only RGB and HSV (by overriding R, G, and B coefs) are available.")
         palette[i] = (int(r*255), int(g*255), int(b*255))
     return(palette)
 

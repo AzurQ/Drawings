@@ -59,6 +59,9 @@
   "speed": [
     10
   ],
+  "color_system": [
+    "hsv"
+  ],
   "dark2light": [
     false
   ],
