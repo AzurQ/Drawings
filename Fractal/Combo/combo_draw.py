@@ -5,12 +5,13 @@ import itertools
 import argparse
 from progress.bar import Bar
 
+# Import Common/functions
 sys.path.insert(1, "/Users/azur/git/Drawings/Fractal/Common")
 from functions import to_list, extract_poly, create_palette, generate_result_path, draw_image, write_inputs, create_poly_list, create_color_palette_list, count_plots, exist, color_params
 
-# Draw a fractal from given inputs
+# Draw a combo fractal from given inputs of two fractals
 ## Inputs may be provided as lists - all possibilites are produced
-def draw(draw_input_dict, folder_save, display = False, continued = False, image_number = 0, cartesian_poly = True, cartesian_color_palette = True):
+def combo_draw(draw_input_dict, folder_save, display = False, continued = False, image_number = 0, cartesian_poly = True, cartesian_color_palette = True):
     # draw_input_dict (dict) is dictionary with all inputs
     # folder_save (str) is path to folder where results should be saved
     # display (bool) indicates if plots should be prompted
@@ -53,7 +54,7 @@ def draw(draw_input_dict, folder_save, display = False, continued = False, image
                 draw_input_dict[item] = to_list(draw_input_dict[item])
 
             # Iterate for graphical options in input file
-            for n_iterations, threshold, scaling_factor, right_shift, upward_shift, rotation, dimension_x, dimension_y in itertools.product(draw_input_dict["n_iterations"], draw_input_dict["threshold"], draw_input_dict["scaling_factor"], draw_input_dict["right_shift"], draw_input_dict["upward_shift"], draw_input_dict["rotation"], draw_input_dict["dimensions"]["x"], draw_input_dict["dimensions"]["y"]):
+            for n_iterations, threshold, scaling_factor, right_shift, upward_shift, rotation, dimension_x, dimension_y, combo_method in itertools.product(draw_input_dict["n_iterations"], draw_input_dict["threshold"], draw_input_dict["scaling_factor"], draw_input_dict["right_shift"], draw_input_dict["upward_shift"], draw_input_dict["rotation"], draw_input_dict["dimensions"]["x"], draw_input_dict["dimensions"]["y"], draw_input_dict["combo_method"]):
 
                 # Update dict used for saving/writing specific input data
                 output_dict["n_iterations"] = n_iterations
@@ -64,23 +65,26 @@ def draw(draw_input_dict, folder_save, display = False, continued = False, image
                 output_dict["rotation"] = rotation
                 output_dict["dimensions"] = {"x": dimension_x, "y": dimension_y}
                 dimensions = [dimension_x, dimension_y]
+                output_dict["combo_method"] = combo_method
 
                 # Create the list of polynomials to iterate
-                poly_list = create_poly_list(draw_input_dict["polynomial"], cartesian_poly)
+                poly_list = create_poly_list(draw_input_dict["polynomial1"], cartesian_poly)
+                poly_list2 = create_poly_list(draw_input_dict["polynomial2"], cartesian_poly)
 
                 # Iterate for each polynomial
                 for poly in poly_list:
+                    for poly2 in poly_list2:
 
-                    # If continued, image should not already exist
-                    if not continued or not exist(image_number, path):
-                        # Plot and save image
-                        draw_image(path, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, rotation, palette, colors_max, display)
-                        # Save image input data
-                        write_inputs(input_path, poly, output_dict, image_number)
-                    # Update image number (int) for saving
-                    image_number += 1
-                    # Update progress bar
-                    progress.next()
+                        # If continued, image should not already exist
+                        if not continued or not exist(image_number, path):
+                            # Plot and save image
+                            draw_image(path, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, rotation, palette, colors_max, display, combo = True, poly2 = poly2, combo_method = combo_method)
+                            # Save image input data
+                            write_inputs(input_path, poly, output_dict, image_number, poly2 = poly2)
+                        # Update image number (int) for saving
+                        image_number += 1
+                        # Update progress bar
+                        progress.next()
 
     progress.finish()
 
@@ -92,7 +96,7 @@ if __name__ == "__main__":
                         help="Folder path for result saving (str)")
     parser.add_argument("-d", "--display", default=False, type = bool,
                         help="Display plots (bool)")
-    parser.add_argument("-i", "--input", default="Inputs/draw-inputs.json", type = str,
+    parser.add_argument("-i", "--input", default="Inputs/combo-inputs.json", type = str,
                         help="Drawing input path (str)")
     parser.add_argument("-n", "--number", default=0,
                         help="Start image number (int)")
@@ -104,4 +108,4 @@ if __name__ == "__main__":
     with open(args.input) as json_file:
         draw_input_dict = json.load(json_file)
 
-    draw(draw_input_dict, args.folder, args.display, args.continued, int(args.number))
+    combo_draw(draw_input_dict, args.folder, args.display, args.continued, int(args.number))

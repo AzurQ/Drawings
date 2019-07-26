@@ -2,7 +2,7 @@ import sys
 import os
 import json
 import argparse
-from draw import draw
+from combo_draw import combo_draw
 
 sys.path.insert(1, "/Users/azur/git/Drawings/Fractal/Common")
 from functions import generate_random_inputs, override
@@ -10,7 +10,7 @@ from functions import generate_random_inputs, override
 # Draw a fractal from given inputs and random distribution for given inputs
 ## Fixed inputs may be provided as lists - all possibilites are produced
 ## Randomly generated inputs override general fixed inputs
-def random_draw(draw_input_dict, random_input_dict, folder_save, display = False, image_number = 0, global_poly_number = None, global_color_palette_number = None):
+def combo_random_draw(draw_input_dict, random_input_dict, folder_save, display = False, image_number = 0, global_poly_number = None, global_color_palette_number = None):
     # draw_input_dict (doct) is dictionary with fixed parameters
     # random_input_dict (dict) is dictionary with random parameter distributions
     # folder_save (str) is path to folder where results should be saved
@@ -24,7 +24,7 @@ def random_draw(draw_input_dict, random_input_dict, folder_save, display = False
     new_input_dict = override(draw_input_dict, generate_random_inputs(random_input_dict, global_poly_number, global_color_palette_number))
 
     # draw function is called with generated inputs
-    draw(new_input_dict, folder_save, display, image_number, cartesian_poly = (global_poly_number is None), cartesian_color_palette = (global_color_palette_number is None))
+    combo_draw(new_input_dict, folder_save, display, image_number, cartesian_poly = (global_poly_number is None), cartesian_color_palette = (global_color_palette_number is None))
 
 
 if __name__ == "__main__":
@@ -33,9 +33,9 @@ if __name__ == "__main__":
                         help="Folder path for result saving (str)")
     parser.add_argument("-d", "--display", default=False, type = bool,
                         help="Display plots (bool)")
-    parser.add_argument("-i", "--input", default="Inputs/draw-inputs.json", type = str,
+    parser.add_argument("-i", "--input", default="Inputs/combo-inputs.json", type = str,
                         help="Drawing input path (str)")
-    parser.add_argument("-r", "--random", default="Inputs/random-inputs.json", type = str,
+    parser.add_argument("-r", "--random", default="Inputs/combo-random-inputs.json", type = str,
                         help="Random input path (str)")
     parser.add_argument("-n", "--number", default=0,
                         help="Start image number (int)")
@@ -53,4 +53,4 @@ if __name__ == "__main__":
     with open(args.random) as random_json_file:
         random_input_dict = json.load(random_json_file)
 
-    random_draw(draw_input_dict, random_input_dict, args.folder, args.display, int(args.number), args.polynomial, args.color)
+    combo_random_draw(draw_input_dict, random_input_dict, args.folder, args.display, int(args.number), args.polynomial, args.color)

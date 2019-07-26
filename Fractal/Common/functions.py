@@ -6,7 +6,7 @@ from PIL import Image
 from PIL import ImageDraw
 import itertools
 import numpy
-from math import cos, sin, pi
+from math import cos, sin, pi, sqrt
 
 # List of graphical color parameters
 color_params = ["x_start", "x_coef", "y_start", "y_coef", "z_start", "z_coef", "speed", "dark2light", "colors_max", "color_system"]
@@ -225,6 +225,25 @@ def iterate(z, poly, threshold, n_iterations):
     return None
 
 
+# Iterate two polynomials and combine results
+def iterate_combo(z, poly1, poly2, combo_method, threshold, n_iterations):
+    n1 = iterate(z, poly1, threshold, n_iterations)
+    n2 = iterate(z, poly2, threshold, n_iterations)
+    if n1 is None or n2 is None:
+        return None
+    else:
+        if combo_method == "sum":
+            return((n1 + n2) / 2)
+        elif combo_method == "mult":
+            return(sqrt(n1 * n2))
+        elif combo_method == "max":
+            return(max(n1, n2))
+        elif combo_method == "min":
+            return(min(n1, n2))
+        elif combo_method == "diff":
+            return(abs(n1 - n2))
+
+
 # Generate save path from folder name
 def generate_result_path(folder_save):
     path = "Results/"
@@ -245,7 +264,7 @@ def exist(image_number, path):
 
 
 # Draw a fractal image from inputs and save image
-def draw_image(path, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, rotation, palette, colors_max, display = False):
+def draw_image(path, image_number, poly, n_iterations, dimensions, threshold, scaling_factor, right_shift, upward_shift, rotation, palette, colors_max, display = False, combo = False, poly2 = None, combo_method = None):
 
     # Define center of the image
     center = (scaling_factor / 2, (scaling_factor / 2) * dimensions[1]/dimensions[0])
@@ -261,7 +280,10 @@ def draw_image(path, image_number, poly, n_iterations, dimensions, threshold, sc
             z = complex(x * scaling_factor / dimensions[0] - center[0] - right_shift, y * scaling_factor / dimensions[0] - center[1] + upward_shift) * complex(cos(rotation * pi / 180), sin(rotation * pi / 180))
 
             # Return convergence value
-            n = iterate(z, poly, threshold, n_iterations)
+            if not combo:
+                n = iterate(z, poly, threshold, n_iterations)
+            else:
+                n = iterate_combo(z, poly, poly2, combo_method, threshold, n_iterations)
 
             # Transform convergence value into color intensity
             if n is None:
@@ -279,20 +301,32 @@ def draw_image(path, image_number, poly, n_iterations, dimensions, threshold, sc
     del d
 
 
-# Save inputs of a given image
-def write_inputs(input_path, poly, input_dict, image_number):
-    # Copy input file data
-    output_file = input_dict.copy()
-    output_file["polynomial"] = {}
-    # Generate the polynomial dictionary of current data
+# Add a polynomial to a dictionnary
+def add_poly_to_dict(poly, dict, key_name):
+    dict[key_name] = {}
     for degree in range(len(poly)):
         if poly[degree] != 0:
             # Write non-nul coefficients
-            output_file["polynomial"][str(degree)] = {}
+            dict[key_name][str(degree)] = {}
             if poly[degree].real != 0:
-                (output_file["polynomial"][str(degree)])["real"] = (poly[degree]).real
+                (dict[key_name][str(degree)])["real"] = (poly[degree]).real
             if poly[degree].imag != 0:
-                (output_file["polynomial"][str(degree)])["imaginary"] = (poly[degree]).imag
+                (dict[key_name][str(degree)])["imaginary"] = (poly[degree]).imag
+    return(dict)
+
+
+# Save inputs of a given image
+def write_inputs(input_path, poly, input_dict, image_number, poly2 = None):
+    # Copy input file data
+    output_file = input_dict.copy()
+    # Generate the polynomial dictionary of current data
+    if poly2 is None:
+        output_file = add_poly_to_dict(poly, output_file, "polynomial")
+    # Save two polynomials if fractal combo
+    else:
+        output_file = add_poly_to_dict(poly, output_file, "polynomial1")
+        output_file = add_poly_to_dict(poly2, output_file, "polynomial2")
+
     # Save input file data
     with open(input_path + str(image_number) + "-draw-inputs.json", 'w') as f:
         json.dump(output_file, f)
@@ -342,7 +376,7 @@ def generate_random_inputs(random_input_dict, global_poly_number = None, global_
     randomly_generated_dict = {}
     # Parse on different dictionary parmeters, and parse within them if nested dictionaries
     for parameter in random_input_dict:
-        if parameter == "polynomial":
+        if parameter == "polynomial" or parameter == "polynomial1" or parameter == "polynomial2":
             if parameter not in randomly_generated_dict:
                 randomly_generated_dict[parameter] = {}
             # Polynomial are splitted into degree dictionaries
@@ -374,7 +408,7 @@ def generate_random_inputs(random_input_dict, global_poly_number = None, global_
 def override(draw_input_dict, random_input_dict):
     # Parse on different dictionary parmeters, and parse within them if nested dictionaries
     for parameter in random_input_dict:
-        if parameter == "polynomial":
+        if parameter == "polynomial" or parameter == "polynomial1" or parameter == "polynomial2":
             for degree in random_input_dict[parameter]:
                 if degree not in draw_input_dict[parameter]:
                     draw_input_dict[parameter][degree] = {}
@@ -398,14 +432,14 @@ def count_plots(input_dict, cartesian_poly = True, cartesian_color_palette = Tru
         if parameter == "dimensions":
             for dimension in input_dict["dimensions"]:
                 n *= len(to_list(input_dict["dimensions"][dimension]))
-        elif parameter == "polynomial":
+        elif parameter == "polynomial" or parameter == "polynomial1" or parameter == "polynomial2":
             if cartesian_poly:
-                for degree in input_dict["polynomial"]:
-                    for part in input_dict["polynomial"][degree]:
-                        n *= len(to_list(input_dict["polynomial"][degree][part]))
+                for degree in input_dict[parameter]:
+                    for part in input_dict[parameter][degree]:
+                        n *= len(to_list(input_dict[parameter][degree][part]))
             # If polynomials are randomly generated without cartesian product, the global_poly_number is used
             else:
-                n *= find_poly_dict_max_length(input_dict["polynomial"])
+                n *= find_poly_dict_max_length(input_dict[parameter])
         elif (parameter in color_params) and not cartesian_color_palette:
             if not color_palette_ok_flag:
                 n *= find_color_palette_dict_max_length(extract_color_palette_dict(input_dict))
