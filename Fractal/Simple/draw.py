@@ -4,6 +4,9 @@ import json
 import itertools
 import argparse
 from progress.bar import Bar
+
+# Import Common.functions
+sys.path.insert(1, "/Users/azur/git/Drawings/Fractal/Common")
 from functions import to_list, extract_poly, create_palette, generate_result_path, draw_image, write_inputs, create_poly_list, create_color_palette_list, count_plots, exist, color_params
 
 # Draw a fractal from given inputs
@@ -30,13 +33,13 @@ def draw(draw_input_dict, folder_save, display = False, continued = False, image
         draw_input_dict[item] = to_list(draw_input_dict[item])
 
     # Iterate for color options in input file
-    for r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max, color_system in create_color_palette_list(draw_input_dict, cartesian_color_palette):
+    for x_start, x_coef, y_start, y_coef, z_start, z_coef, speed, dark2light, colors_max, color_system in create_color_palette_list(draw_input_dict, cartesian_color_palette):
 
         # Create the graphical palette
-        palette = create_palette(r_start, r_coef, g_start, g_coef, b_start, b_coef, speed, dark2light, colors_max, color_system)
+        palette = create_palette(x_start, x_coef, y_start, y_coef, z_start, z_coef, speed, dark2light, colors_max, color_system)
 
         # Dict used for saving/writing specific input data
-        output_dict = {"r_start": r_start, "r_coef": r_coef, "g_start": g_start, "g_coef": g_coef, "b_start": b_start, "b_coef": b_coef, "speed": speed, "dark2light": dark2light, "colors_max": colors_max, "color_system": color_system}
+        output_dict = {"x_start": x_start, "x_coef": x_coef, "y_start": y_start, "y_coef": y_coef, "z_start": z_start, "z_coef": z_coef, "speed": speed, "dark2light": dark2light, "colors_max": colors_max, "color_system": color_system}
 
         # Some color options may be incompatible - they are not considered
         if palette is None:

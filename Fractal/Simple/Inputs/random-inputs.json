@@ -1,40 +1,40 @@
 {
-  "r_start": {
+  "x_start": {
     "uniform": {
       "low_bound": 0,
       "high_bound": 1,
       "samples": 1
     }
   },
-  "r_coef": {
+  "x_coef": {
     "uniform": {
       "low_bound": -1,
       "high_bound": 1,
       "samples": 1
     }
   },
-  "g_start": {
+  "y_start": {
     "uniform": {
       "low_bound": 0,
       "high_bound": 1,
       "samples": 1
     }
   },
-  "g_coef": {
+  "y_coef": {
     "uniform": {
       "low_bound": -1,
       "high_bound": 1,
       "samples": 1
     }
   },
-  "b_start": {
+  "z_start": {
     "uniform": {
       "low_bound": 0,
       "high_bound": 1,
       "samples": 1
     }
   },
-  "b_coef": {
+  "z_coef": {
     "uniform": {
       "low_bound": -1,
       "high_bound": 1,
